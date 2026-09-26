@@ -1,212 +1,702 @@
-# Potato Disease Classification
+# 🥔 Potato Disease Classification — End-to-End AI & Edge Deployment
 
-## Setup for Python:
+> **An end-to-end computer vision system for potato leaf disease classification, extended from model training and cloud deployment to ONNX conversion and hardware-accelerated Edge AI inference on Qualcomm Snapdragon X Elite.**
 
-1. Install Python ([Setup instructions](https://wiki.python.org/moin/BeginnersGuide))
+This project started as a deep learning application for identifying potato plant diseases from leaf images and evolved into a broader **ML deployment and Edge AI engineering project**.
 
-2. Install Python packages
+The system covers the complete lifecycle of an AI model:
 
+**Dataset → Model Training → Model Validation → API → Web/Mobile Applications → Cloud Deployment → TensorFlow Lite → ONNX → Snapdragon NPU Acceleration → Performance Benchmarking**
+
+---
+
+## 🚀 Project Overview
+
+The system uses a deep learning image-classification model to identify the health condition of potato leaves.
+
+Given an image of a potato leaf, the trained model predicts the corresponding disease category and returns the prediction through an API that can be consumed by web and mobile applications.
+
+The project was subsequently extended to investigate **on-device AI inference and hardware acceleration**, converting the trained TensorFlow/Keras model to ONNX and compiling it for **Qualcomm Snapdragon X Elite** using Qualcomm AI Hub.
+
+This allowed the same trained model to be evaluated across:
+
+* Traditional server-side inference
+* TensorFlow Serving
+* TensorFlow Lite
+* ONNX inference
+* Qualcomm Snapdragon CPU
+* Qualcomm Snapdragon NPU
+
+---
+
+# 🧠 System Architecture
+
+```text
+                    ┌─────────────────────┐
+                    │   Potato Leaf Image │
+                    └──────────┬──────────┘
+                               │
+                               ▼
+                    ┌─────────────────────┐
+                    │ Image Preprocessing │
+                    └──────────┬──────────┘
+                               │
+                               ▼
+                    ┌─────────────────────┐
+                    │ TensorFlow / Keras  │
+                    │ Disease Classifier  │
+                    └──────────┬──────────┘
+                               │
+                ┌──────────────┼──────────────┐
+                │              │              │
+                ▼              ▼              ▼
+          FastAPI API    TensorFlow Lite    ONNX
+                │                             │
+                ▼                             ▼
+        Web / Mobile App             Qualcomm AI Hub
+                                              │
+                                              ▼
+                                    Snapdragon X Elite
+                                              │
+                                     ┌────────┴────────┐
+                                     ▼                 ▼
+                                    CPU               NPU
 ```
-pip3 install -r training/requirements.txt
-pip3 install -r api/requirements.txt
+
+---
+
+# 🎯 Objectives
+
+The project was developed with several goals:
+
+* Build an end-to-end computer vision classification system
+* Train a deep learning model for plant disease recognition
+* Expose model inference through a REST API
+* Build web and mobile interfaces for predictions
+* Explore cloud-based model serving
+* Convert the model for lightweight deployment
+* Investigate cross-platform model portability using ONNX
+* Deploy and profile the model on dedicated Edge AI hardware
+* Compare CPU and NPU inference performance
+
+---
+
+# 📊 Dataset
+
+The model was trained using the **PlantVillage dataset**.
+
+The dataset contains labeled plant leaf images covering multiple crop and disease categories.
+
+For this project, only the potato-related classes were retained.
+
+### Potato Classes
+
+The classification task covers:
+
+* 🥔 Potato — Early Blight
+* 🥔 Potato — Late Blight
+* 🌿 Potato — Healthy
+
+The dataset was prepared and processed before being used for model training.
+
+---
+
+# 🤖 Deep Learning Model
+
+The original classifier was developed using:
+
+* **Python**
+* **TensorFlow**
+* **Keras**
+* Image preprocessing and normalization
+* CNN-based image classification
+
+The trained model was initially saved as a TensorFlow/Keras `.h5` model.
+
+```text
+Input Image
+     ↓
+Image Preprocessing
+     ↓
+CNN Feature Extraction
+     ↓
+Classification Layer
+     ↓
+Disease Probabilities
+     ↓
+Predicted Disease
 ```
 
-3. Install Tensorflow Serving ([Setup instructions](https://www.tensorflow.org/tfx/serving/setup))
+The model can therefore be used independently of the application layer and deployed through multiple inference backends.
 
-## Setup for ReactJS
+---
 
-1. Install Nodejs ([Setup instructions](https://nodejs.org/en/download/package-manager/))
-2. Install NPM ([Setup instructions](https://www.npmjs.com/get-npm))
-3. Install dependencies
+# 🔌 Backend API
+
+A **FastAPI** backend provides an interface between the trained model and the client applications.
+
+### Request Flow
+
+```text
+Client
+  │
+  │ Image
+  ▼
+FastAPI
+  │
+  ▼
+Model Inference
+  │
+  ▼
+Prediction
+  │
+  └──► Disease + Confidence
+```
+
+The API can be run locally using:
+
+```bash
+cd api
+
+uvicorn main:app --reload --host 0.0.0.0
+```
+
+The API is then available on:
+
+```text
+http://localhost:8000
+```
+
+---
+
+# 🌐 Web Application
+
+A React-based frontend provides a user interface for interacting with the disease classification API.
+
+### Technologies
+
+* ReactJS
+* JavaScript
+* REST API
+* NPM
+
+Install dependencies:
 
 ```bash
 cd frontend
-npm install --from-lock-json
-npm audit fix
+npm install
 ```
 
-4. Copy `.env.example` as `.env`.
+Configure the API endpoint through:
 
-5. Change API url in `.env`.
+```text
+.env
+```
 
-## Setup for React-Native app
+Then start the application:
 
-1. Go to the [React Native environment setup](https://reactnative.dev/docs/environment-setup), then select `React Native CLI Quickstart` tab.  
+```bash
+npm run start
+```
 
-2. Install dependencies
+---
+
+# 📱 Mobile Application
+
+The project also includes a React Native application for mobile-based disease classification.
 
 ```bash
 cd mobile-app
 yarn install
 ```
 
-  - 2.1 Only for mac users
-```bash
-cd ios && pod install && cd ../
+Configure the API endpoint in:
+
+```text
+.env
 ```
 
-3. Copy `.env.example` as `.env`.
-
-4. Change API url in `.env`.
-
-## Training the Model
-
-1. Download the data from [kaggle](https://www.kaggle.com/arjuntejaswi/plant-village).
-2. Only keep folders related to Potatoes.
-3. Run Jupyter Notebook in Browser.
-
-```bash
-jupyter notebook
-```
-
-4. Open `training/potato-disease-training.ipynb` in Jupyter Notebook.
-5. In cell #2, update the path to dataset.
-6. Run all the Cells one by one.
-7. Copy the model generated and save it with the version number in the `models` folder.
-
-## Running the API
-
-### Using FastAPI
-
-1. Get inside `api` folder
-
-```bash
-cd api
-```
-
-2. Run the FastAPI Server using uvicorn
-
-```bash
-uvicorn main:app --reload --host 0.0.0.0
-```
-
-3. Your API is now running at `0.0.0.0:8000`
-
-### Using FastAPI & TF Serve
-
-1. Get inside `api` folder
-
-```bash
-cd api
-```
-
-2. Copy the `models.config.example` as `models.config` and update the paths in file.
-3. Run the TF Serve (Update config file path below)
-
-```bash
-docker run -t --rm -p 8501:8501 -v C:/Code/potato-disease-classification:/potato-disease-classification tensorflow/serving --rest_api_port=8501 --model_config_file=/potato-disease-classification/models.config
-```
-
-4. Run the FastAPI Server using uvicorn
-   For this you can directly run it from your main.py or main-tf-serving.py using pycharm run option (as shown in the video tutorial)
-   OR you can run it from command prompt as shown below,
-
-```bash
-uvicorn main-tf-serving:app --reload --host 0.0.0.0
-```
-
-5. Your API is now running at `0.0.0.0:8000`
-
-## Running the Frontend
-
-1. Get inside `api` folder
-
-```bash
-cd frontend
-```
-
-2. Copy the `.env.example` as `.env` and update `REACT_APP_API_URL` to API URL if needed.
-3. Run the frontend
-
-```bash
-npm run start
-```
-
-## Running the app
-
-1. Get inside `mobile-app` folder
-
-```bash
-cd mobile-app
-```
-
-2. Copy the `.env.example` as `.env` and update `URL` to API URL if needed.
-
-3. Run the app (android/iOS)
+Run on Android:
 
 ```bash
 npm run android
 ```
 
-or
+or iOS:
 
 ```bash
 npm run ios
 ```
 
-4. Creating public ([signed APK](https://reactnative.dev/docs/signed-apk-android))
+This creates a mobile interface capable of sending plant images to the backend for inference.
 
+---
 
-## Creating the TF Lite Model
+# ☁️ Cloud Deployment
 
-1. Run Jupyter Notebook in Browser.
+The project was also designed to support cloud-based model serving.
+
+### TensorFlow Serving
+
+TensorFlow Serving can be used as the model-serving layer while FastAPI acts as the application/API layer.
+
+```text
+Client
+   ↓
+FastAPI
+   ↓
+TensorFlow Serving
+   ↓
+TensorFlow Model
+   ↓
+Prediction
+```
+
+TensorFlow Serving can be started using Docker with the appropriate model configuration.
+
+---
+
+# 📱 TensorFlow Lite
+
+To investigate lightweight inference, the TensorFlow model can also be converted into a **TensorFlow Lite model**.
+
+The conversion workflow is provided in:
+
+```text
+training/tf-lite-converter.ipynb
+```
+
+The resulting model can be used for more resource-constrained deployment scenarios, including mobile and edge environments.
+
+---
+
+# ⚡ Edge AI Extension
+
+## From Cloud Inference to Hardware-Accelerated AI
+
+The project was extended beyond conventional server-side inference to investigate **Edge AI deployment and hardware acceleration**.
+
+The trained TensorFlow/Keras model was converted into **ONNX**, allowing it to be used with a broader range of deployment and hardware acceleration frameworks.
+
+### Edge AI Pipeline
+
+```text
+TensorFlow / Keras
+        │
+        ▼
+   Trained .h5 Model
+        │
+        ▼
+   ONNX Conversion
+        │
+        ▼
+ Qualcomm AI Hub
+        │
+        ▼
+ Snapdragon X Elite
+        │
+   ┌────┴────┐
+   ▼         ▼
+ CPU        NPU
+```
+
+---
+
+# 🔄 ONNX Model Conversion
+
+The original Keras model was converted to ONNX to improve deployment portability.
+
+During conversion, several real-world compatibility issues were encountered, including:
+
+* Keras/TensorFlow version compatibility
+* Model compilation configuration
+* Tensor naming compatibility
+* SavedModel interoperability
+
+The final conversion pipeline used TensorFlow's SavedModel representation as an intermediate format before producing the ONNX model.
+
+The resulting ONNX model was then independently tested to verify that inference remained valid after conversion.
+
+### Conversion Validation
+
+The converted model was tested using sample inputs and produced valid class probability distributions, confirming that the conversion did not silently break model inference.
+
+---
+
+# 🧩 Qualcomm AI Hub Deployment
+
+The ONNX model was compiled for **Qualcomm Snapdragon X Elite** using **Qualcomm AI Hub Workbench**.
+
+This enabled profiling on Snapdragon hardware without requiring a dedicated physical development device.
+
+The deployment process included:
+
+1. Preparing the ONNX model
+2. Defining the model input specification
+3. Compiling the model for Snapdragon X Elite
+4. Profiling the compiled model
+5. Evaluating processor utilization
+6. Comparing NPU and CPU execution
+
+---
+
+# ⚙️ NPU vs CPU Benchmark
+
+One of the key outcomes of the Edge AI extension was a direct comparison between CPU inference and NPU-accelerated inference.
+
+### Measured Benchmark
+
+| Metric                   | Snapdragon NPU |     CPU |
+| ------------------------ | -------------: | ------: |
+| Median inference latency |        ~0.2 ms | ~2.3 ms |
+| Reported memory usage    |          ~2 MB |  ~35 MB |
+| Model execution          |       100% NPU |     CPU |
+
+### Observed Difference
+
+In this specific benchmark:
+
+* NPU inference showed approximately **5–7× lower latency**
+* Reported memory usage was approximately **17× lower**
+* The profiling run executed **100% of the model on the NPU**
+
+> **Important:** These numbers represent the measured benchmark configuration and should not be interpreted as universal performance characteristics for all models or Snapdragon devices.
+
+---
+
+# 🔬 Why the Edge AI Extension Matters
+
+The Edge AI portion demonstrates more than simply converting a model between formats.
+
+It covers several practical ML engineering concepts:
+
+### Model Portability
+
+Moving a trained model from TensorFlow/Keras into the ONNX ecosystem.
+
+### Hardware-Aware Deployment
+
+Compiling and preparing the model for a specific AI accelerator.
+
+### NPU Acceleration
+
+Using dedicated neural processing hardware instead of relying exclusively on the CPU.
+
+### Performance Profiling
+
+Measuring real inference latency and memory consumption rather than relying only on theoretical specifications.
+
+### Deployment Optimization
+
+Understanding the differences between:
+
+```text
+Cloud / Server Inference
+        ↓
+Mobile / Lightweight Inference
+        ↓
+Edge CPU Inference
+        ↓
+Dedicated NPU Inference
+```
+
+---
+
+# 🛠️ Technology Stack
+
+### Machine Learning
+
+* Python
+* TensorFlow
+* Keras
+* Convolutional Neural Networks
+* Image Classification
+
+### Model Deployment
+
+* TensorFlow Serving
+* TensorFlow Lite
+* ONNX
+* Qualcomm AI Hub Workbench
+
+### Backend
+
+* FastAPI
+* Uvicorn
+* REST APIs
+
+### Frontend
+
+* ReactJS
+* JavaScript
+* NPM
+
+### Mobile
+
+* React Native
+* Android
+* iOS
+
+### Cloud
+
+* Google Cloud Platform
+* Google Cloud Storage
+* Google Cloud Functions
+* Docker
+
+### Edge AI
+
+* Qualcomm Snapdragon X Elite
+* NPU acceleration
+* CPU inference
+* Hardware profiling
+* Latency benchmarking
+
+---
+
+# 📁 Project Structure
+
+```text
+plant-disease-classification/
+│
+├── api/
+│   ├── main.py
+│   ├── main-tf-serving.py
+│   ├── requirements.txt
+│   └── models.config.example
+│
+├── frontend/
+│   ├── src/
+│   ├── public/
+│   └── package.json
+│
+├── mobile-app/
+│   ├── android/
+│   ├── ios/
+│   └── package.json
+│
+├── training/
+│   ├── potato-disease-training.ipynb
+│   ├── tf-lite-converter.ipynb
+│   └── requirements.txt
+│
+├── models/
+│   └── ...
+│
+├── tf-lite-models/
+│   └── ...
+│
+├── gcp/
+│   └── ...
+│
+└── README.md
+```
+
+---
+
+# 🧪 Training the Model
+
+Download the PlantVillage dataset:
+
+```text
+https://www.kaggle.com/arjuntejaswi/plant-village
+```
+
+Keep only the potato-related classes.
+
+Launch Jupyter:
 
 ```bash
 jupyter notebook
 ```
 
-2. Open `training/tf-lite-converter.ipynb` in Jupyter Notebook.
-3. In cell #2, update the path to dataset.
-4. Run all the Cells one by one.
-5. Model would be saved in `tf-lite-models` folder.
+Open:
 
-## Deploying the TF Lite on GCP
-
-1. Create a [GCP account](https://console.cloud.google.com/freetrial/signup/tos?_ga=2.25841725.1677013893.1627213171-706917375.1627193643&_gac=1.124122488.1627227734.Cj0KCQjwl_SHBhCQARIsAFIFRVVUZFV7wUg-DVxSlsnlIwSGWxib-owC-s9k6rjWVaF4y7kp1aUv5eQaAj2kEALw_wcB).
-2. Create a [Project on GCP](https://cloud.google.com/appengine/docs/standard/nodejs/building-app/creating-project) (Keep note of the project id).
-3. Create a [GCP bucket](https://console.cloud.google.com/storage/browser/).
-4. Upload the potatoes.h5 model in the bucket in the path `models/potatos.h5`.
-5. Install Google Cloud SDK ([Setup instructions](https://cloud.google.com/sdk/docs/quickstarts)).
-6. Authenticate with Google Cloud SDK.
-
-```bash
-gcloud auth login
+```text
+training/potato-disease-training.ipynb
 ```
 
-7. Run the deployment script.
+Update the dataset path and execute the notebook.
 
-```bash
-cd gcp
-gcloud functions deploy predict_lite --runtime python38 --trigger-http --memory 512 --project project_id
+The resulting model can then be stored under:
+
+```text
+models/
 ```
 
-8. Your model is now deployed.
-9. Use Postman to test the GCF using the [Trigger URL](https://cloud.google.com/functions/docs/calling/http).
+with an appropriate version number.
 
-Inspiration: https://cloud.google.com/blog/products/ai-machine-learning/how-to-serve-deep-learning-models-using-tensorflow-2-0-with-cloud-functions
+---
 
-## Deploying the TF Model (.h5) on GCP
+# 🚀 Installation
 
-1. Create a [GCP account](https://console.cloud.google.com/freetrial/signup/tos?_ga=2.25841725.1677013893.1627213171-706917375.1627193643&_gac=1.124122488.1627227734.Cj0KCQjwl_SHBhCQARIsAFIFRVVUZFV7wUg-DVxSlsnlIwSGWxib-owC-s9k6rjWVaF4y7kp1aUv5eQaAj2kEALw_wcB).
-2. Create a [Project on GCP](https://cloud.google.com/appengine/docs/standard/nodejs/building-app/creating-project) (Keep note of the project id).
-3. Create a [GCP bucket](https://console.cloud.google.com/storage/browser/).
-4. Upload the tf .h5 model generate in the bucket in the path `models/potato-model.h5`.
-5. Install Google Cloud SDK ([Setup instructions](https://cloud.google.com/sdk/docs/quickstarts)).
-6. Authenticate with Google Cloud SDK.
+## Python
+
+Install the required dependencies:
 
 ```bash
-gcloud auth login
+pip3 install -r training/requirements.txt
+pip3 install -r api/requirements.txt
 ```
 
-7. Run the deployment script.
+## React
 
 ```bash
-cd gcp
-gcloud functions deploy predict --runtime python38 --trigger-http --memory 512 --project project_id
+cd frontend
+npm install
 ```
 
-8. Your model is now deployed.
-9. Use Postman to test the GCF using the [Trigger URL](https://cloud.google.com/functions/docs/calling/http).
+Configure:
 
-Inspiration: https://cloud.google.com/blog/products/ai-machine-learning/how-to-serve-deep-learning-models-using-tensorflow-2-0-with-cloud-functions
+```text
+.env
+```
+
+with the appropriate API URL.
+
+## React Native
+
+```bash
+cd mobile-app
+yarn install
+```
+
+For iOS:
+
+```bash
+cd ios
+pod install
+cd ../
+```
+
+---
+
+# 🔮 Future Improvements
+
+Potential future extensions include:
+
+* Model quantization
+* INT8 inference
+* Further ONNX Runtime optimization
+* Snapdragon GPU vs NPU benchmarking
+* Additional mobile-device benchmarking
+* Batch vs single-image latency analysis
+* Power/energy profiling
+* Model compression
+* Larger and more diverse real-world datasets
+* Additional crop and disease categories
+* Continuous model monitoring
+* Containerized production deployment
+* CI/CD for model deployment
+
+---
+
+# 📈 Project Evolution
+
+This project evolved through multiple stages:
+
+```text
+                    PHASE 1
+               Deep Learning
+                     │
+                     ▼
+             Potato Disease
+              Classification
+                     │
+                     ▼
+                    PHASE 2
+               Application Layer
+                     │
+             ┌───────┴───────┐
+             ▼               ▼
+          FastAPI          React
+             │
+             ▼
+       React Native
+                     │
+                     ▼
+                    PHASE 3
+              Cloud Deployment
+                     │
+             TensorFlow Serving
+                     │
+                     ▼
+               TensorFlow Lite
+                     │
+                     ▼
+                    PHASE 4
+                 Edge AI
+                     │
+                  ONNX
+                     │
+                     ▼
+             Qualcomm AI Hub
+                     │
+                     ▼
+            Snapdragon X Elite
+                     │
+              ┌──────┴──────┐
+              ▼             ▼
+             CPU           NPU
+              │             │
+              └──────┬──────┘
+                     ▼
+              Benchmarking
+```
+
+---
+
+# 💡 Key Engineering Takeaways
+
+This project provided hands-on experience across the complete AI deployment lifecycle:
+
+**1. Model Development**
+
+Training and validating a computer vision model using TensorFlow/Keras.
+
+**2. Model Serving**
+
+Exposing ML inference through a FastAPI backend and TensorFlow Serving.
+
+**3. Application Integration**
+
+Connecting machine learning inference to web and mobile applications.
+
+**4. Cloud Deployment**
+
+Exploring deployment of ML inference components through Google Cloud.
+
+**5. Model Portability**
+
+Converting a TensorFlow/Keras model into ONNX for cross-platform deployment.
+
+**6. Edge AI**
+
+Compiling and profiling the model on Qualcomm Snapdragon X Elite hardware.
+
+**7. Hardware Acceleration**
+
+Comparing CPU execution with dedicated NPU inference.
+
+**8. Performance Engineering**
+
+Using measured latency and memory results to evaluate deployment efficiency.
+
+---
+
+# 👩‍💻 Author
+
+**Thejaswini Sunil**
+
+Computer Science | AI / Machine Learning | Computer Vision | Edge AI
+
+[GitHub](https://github.com/ThejaswiniSunil)
+
+---
+
+## ⭐ Project Summary
+
+> **A full-stack computer vision project that evolved from a plant disease classifier into an end-to-end AI deployment experiment spanning deep learning, API development, web/mobile applications, cloud serving, model conversion, and hardware-accelerated Edge AI inference.**
+
+**TensorFlow → FastAPI → React → React Native → GCP → TensorFlow Lite → ONNX → Qualcomm AI Hub → Snapdragon NPU**
 
